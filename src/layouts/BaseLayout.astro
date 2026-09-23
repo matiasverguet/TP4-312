@@ -8,6 +8,10 @@ const { title, description = "Visualisation de données des manchots avec Observ
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
 const pages = [
   { href: '/', label: 'Accueil' },
+  { href: '/simple', label: 'Essai simple' },
+  { href: '/penguins', label: 'Penguins' },
+  { href: '/penguins-filter', label: 'Penguins : filtre espèce' },
+  { href: '/penguins-filters', label: 'Penguins : plusieurs filtres' },
   { href: '/species', label: 'Espèces' },
   { href: '/species-tabs', label: 'Espèces avec onglets' },
   { href: '/species/Adelie', label: 'Adélie' },

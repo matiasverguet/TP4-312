@@ -2,7 +2,6 @@
 import Layout from '../layouts/BaseLayout.astro';
 import PlotFigure from '../components/PlotFigure.astro';
 import * as Plot from '@observablehq/plot';
-import { Tabs, TabsList, TabsPanel, TabsTab } from 'accessible-astro-components';
 import penguins from '../data/penguins.json';
 import { speciesColorDomain, speciesColorRange, speciesColors } from '../data/speciesColors';
 
@@ -24,30 +23,33 @@ const colorOptions = { domain: speciesColorDomain, range: speciesColorRange };
       <p class="page-intro">Chaque onglet affiche le graphique d'une espèce.</p>
     </header>
 
-    <Tabs class="!w-full">
-      <TabsList aria-label="Choisir une espèce" class="!mb-4">
+    <div class="tabs">
+      <div class="tabs-list" role="tablist" aria-label="Choisir une espèce">
         {species.map((item, index) => (
-          <TabsTab
+          <button
+            type="button"
             id={`tab-${item.id}`}
-            controls={`panel-${item.id}`}
-            selected={index === 0}
-            class={`!rounded-lg !border-2 !px-4 !py-3 aria-selected:!text-white`}
+            role="tab"
+            aria-controls={`panel-${item.id}`}
+            aria-selected={index === 0}
+            class="tab-button"
             style={`border-color: ${item.color}; --species-color: ${item.color}`}
           >
             {item.label}
-          </TabsTab>
+          </button>
         ))}
-      </TabsList>
+      </div>
 
       {species.map((item, index) => {
         const data = penguins.filter((penguin) => penguin.species === item.name);
 
         return (
-          <TabsPanel
+          <section
             id={`panel-${item.id}`}
-            labelledby={`tab-${item.id}`}
-            selected={index === 0}
-            class="!rounded-lg !border !border-slate-200 !bg-white !p-4"
+            role="tabpanel"
+            aria-labelledby={`tab-${item.id}`}
+            class="tab-panel"
+            hidden={index !== 0}
           >
             <div class="species-slide__heading">
               <h2>{item.label}</h2>
@@ -68,10 +70,10 @@ const colorOptions = { domain: speciesColorDomain, range: speciesColorRange };
             <a class="species-slide__link" href={`/species/${item.name}/`} style={`--species-color: ${item.color}`}>
               Voir la page {item.label}
             </a>
-          </TabsPanel>
+          </section>
         );
       })}
-    </Tabs>
+    </div>
   </div>
 </Layout>
 
@@ -136,3 +138,18 @@ const colorOptions = { domain: speciesColorDomain, range: speciesColorRange };
     }
   }
 </style>
+
+<script>
+  const tabButtons = document.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+  const tabPanels = document.querySelectorAll<HTMLElement>('[role="tabpanel"]');
+
+  tabButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const panelId = button.getAttribute('aria-controls');
+      tabButtons.forEach((tab) => tab.setAttribute('aria-selected', String(tab === button)));
+      tabPanels.forEach((panel) => {
+        panel.hidden = panel.id !== panelId;
+      });
+    });
+  });
+</script>
